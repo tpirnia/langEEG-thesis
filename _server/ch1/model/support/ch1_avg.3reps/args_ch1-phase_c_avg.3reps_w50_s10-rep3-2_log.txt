@@ -1,0 +1,20 @@
+{
+  "classifier": "log",
+  "data_suffix": "data_avg.3reps_context",
+  "suffix_X": "_phase",
+  "suffix_y": "_phase",
+  "suffix_groups": "",
+  "group": "reps",
+  "t_end": null,
+  "trial_len": "",
+  "perm": 0,
+  "n_perms": 0,
+  "window": 50,
+  "step": 10,
+  "subject": "",
+  "out_name": "results_ch1-phase_c_avg.3reps_w50_s10-rep3-2_log",
+  "project_path": "/project_data/volume0/tpirnia/data/EEGWS/",
+  "splitter": "groupkfold",
+  "inner_splits": 2,
+  "outer_splits": 3
+}
