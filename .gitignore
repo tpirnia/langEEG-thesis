@@ -27,7 +27,6 @@ repo/batch/
 repo/env_/
 repo/_duplicates/
 repo/permutations/*.csv
-results/
 results/to_delete/
 results/TG/
 *_train.npy
