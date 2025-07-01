@@ -1,0 +1,18 @@
+{
+  "classifier": "ridge",
+  "suffix": "c_avg",
+  "data_suffix": "",
+  "suffix_X": "_interp",
+  "suffix_y": "",
+  "suffix_groups": "",
+  "group": "",
+  "t_end": null,
+  "trial_len": "",
+  "n_perms": 0,
+  "window": 50,
+  "step": 10,
+  "out_name": "phase_accuracy_loo_w50",
+  "splitter": "groupkfold",
+  "inner_splits": 5,
+  "outer_splits": ""
+  }

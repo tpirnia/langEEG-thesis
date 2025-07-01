@@ -1,0 +1,56 @@
+# Large project-specific directories
+data/
+repo/env_/
+repo/_duplicates/
+results/permutations/
+log/
+
+# Large data files
+*.npy
+*.npz
+*.pkl
+*.lock
+
+# Python environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Specific patterns
+*del*
+*tmp*
+*untitled*
+*Untitled*
+args_*.txt
+_*.sh
+_*.txt
+*_.png
+*_.csv
+
+# Temporary files
+*.tmp
+*.temp
+
+# Python
+__pycache__/
+.pytest_cache/
+*.py[cod]
+*$py.class
+*.so
+*.pyc
+.Python
+var/
+profile_default/
+ipython_config.py
+*.ipynb
+*.ipynb_checkpoints
+.ipynb_checkpoints/
+
+# System files
+.DS_Store
+Thumbs.db
+.vscode/

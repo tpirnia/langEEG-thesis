@@ -1,0 +1,15 @@
+{
+  "suffix_X": "__ur",
+  "suffix_y": "__ur",
+  "suffix_groups": "__ur",
+  "group": "reps",
+  "t_end": null,
+  "trial_len": "",
+  "perm": 0,
+  "n_perms": 0,
+  "window": 1000,
+  "step": 500,
+  "splitter": "groupkfold",
+  "inner_splits": 2,
+  "outer_splits": 3
+}

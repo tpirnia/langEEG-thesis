@@ -1,0 +1,14 @@
+{
+  "classifier": "ridge",
+  "suffix": "",
+  "suffix_X": "",
+  "suffix_y": "",
+  "suffix_groups": "",
+  "t_end": null,
+  "trial_len": "",
+  "n_perms": 1000,
+  "window": 1000,
+  "step": 500,
+  "inner_splits": 5,
+  "outer_splits": 5
+  }

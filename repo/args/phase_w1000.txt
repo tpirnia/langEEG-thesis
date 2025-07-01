@@ -1,0 +1,12 @@
+{
+  "classifier": "",
+  "suffix": "c_avg",
+  "suffix_X": "",
+  "suffix_y": "",
+  "suffix_groups": "",
+  "perm": 0,
+  "window": 1000,
+  "step": 500,
+  "inner_splits": 5,
+  "outer_splits": 5
+  }

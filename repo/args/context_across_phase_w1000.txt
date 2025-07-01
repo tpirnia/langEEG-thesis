@@ -1,0 +1,21 @@
+{
+  "classifier": "",
+  "data_suffix": "context",
+  "suffix_X": "_phase",
+  "suffix_y": "_context",
+  "suffix_y2": "_phase",
+  "suffix_groups": "",
+  "group": "reps",
+  "t_end": null,
+  "trial_len": "",
+  "perm": 0,
+  "n_perms": 0,
+  "window": 1000,
+  "step": 500,
+  "subject": "",
+  "out_name": "context_accuracy_across_conflict",
+  "project_path": "/project_data/volume0/tpirnia/thesis_repository/",
+  "splitter": "groupkfold",
+  "inner_splits": 2,
+  "outer_splits": 3
+}
