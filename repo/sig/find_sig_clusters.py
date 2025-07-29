@@ -35,7 +35,7 @@ def add_sig(full_arr, cluster, sig_arr=None):
 
 if __name__ == '__main__':
     subject = sys.argv[1]
-    thresh = np.float(sys.argv[2])
+    thresh = float(sys.argv[2])
     train_subject = '-subject'
     print(subject)
     n_perms = 500

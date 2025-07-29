@@ -18,7 +18,6 @@ def inner_CV(fld, w_j, X, y, groups, trte,
         - y: 2 dimensions: [n_trials, n_windows]
         - groups: 2 dimensions: [n_trials, n_windows]
     """
-    t_inner = time.time()
     train_ind, test_ind = trte[fld]
     n_train, n_test = len(test_ind), len(test_ind)
     
@@ -62,7 +61,6 @@ def inner_CV_by_rep(fld, w_j, X, y, groups, trte,
         - y: 2 dimensions: [n_trials, n_windows]
         - groups: 2 dimensions: [n_trials, n_windows]
     """
-    t_inner = time.time()
     train_ind, test_ind = trte[fld]
     n_train, n_test = len(test_ind), len(test_ind)
     
@@ -107,7 +105,7 @@ def inner_CV_by_rep_permutations(fld, w_j, X, y, groups, trte, classifier,arg=No
         - groups: 2 dimensions: [n_trials, n_windows]
     """
     train_ind, test_ind = trte[fld]
-    n_train, n_test = len(train_ind), len(test_ind)
+    _, n_test = len(train_ind), len(test_ind)
     
     X_train, X_test = np.squeeze(X[train_ind, w_j,:,:]), X[test_ind]
     y_train, y_test = np.squeeze(y[train_ind, w_j]), y[test_ind]
@@ -163,7 +161,6 @@ def across_classify(fld, w_j, X, y, groups, trte, conditions,
         - y: 2 dimensions: [n_trials, n_windows]
         - groups: 2 dimensions: [n_trials, n_windows]
     """
-    t_inner = time.time()
     train_ind, test_ind = trte[fld]
     n_train, n_test = len(test_ind), len(test_ind)
     

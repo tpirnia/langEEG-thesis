@@ -12,15 +12,49 @@ cv_splitter={"groupkfold": GroupKFold,
              "stratifiedkfold": StratifiedKFold,
              "gridsearchcv": GridSearchCV}
 
+
+def inner_CV_by_window(w_j, X_train, y_train, groups_train,
+                       X_test,y_test,
+                       conditions,
+                       inner_splits, classifier,
+                       subject,
+                       arg=None,
+                       **_,):
+
+    # steps to complete:
+    # get segment of data for this window
+    # get presegmented data and apply permutation indices
+    X_train_w = X_train[w_j]  # shape: 
+    y_train_w = y_train[w_j] # shape:
+    groups_train_w = groups_train[w_j] # Shape: 
+
+    # relabel test if necessary.
+    #
+
+    # set up cross validation procedure
+
+    # fit model for each fold
+
+    # save best parameters
+
+    # predict on test data
+    # 
+
+
+def classify_permute_presegmented(X_train, y_train, groups_train, X_test, y_test, conditions, w_j, train_idx, classifier, arg):
+    X_train_w = X_train[w_j][train_idx]  # shape: 
+    y_train_w = y_train[w_j][train_idx]  # shape:
+    groups_train_w = groups_train[w_j][ train_idx]  # Shape: 
+    pass
+
+
 def inner_CV_by_rep(fold, w_j, X, y, conditions, groups, trte, 
              inner_splits, 
              classifier, subject, splitter, perm=False, results_out=False, arg=None, rand_gen=None, **_):
     """input: 
         - X: 4 dimensions: [n_trials, n_windows, n_channels, n_timepoints]
         - y: 2 dimensions: [n_trials, n_windows]
-        - groups: 2 dimensions: [n_trials, n_windows]
-    """
-    t_inner = time.time()
+        - groups: 2 dimensions: [n_trials, n_windows]    """
     
     ######## Below is new.
     trte, y_cross, y_clf = conditions.relabel_classes(y, trte)
@@ -30,16 +64,12 @@ def inner_CV_by_rep(fold, w_j, X, y, conditions, groups, trte,
     n_train, n_test = len(train_ind), len(test_ind)
     
     X_train, X_test = np.squeeze(X[train_ind, w_j,:,:]), X[test_ind]
-    if perm:
-        rifperm_tr,rifperm_te = rand_gen.permutation(n_train), rand_gen.permutation(n_test)
-    else:
-        rifperm_tr, rifperm_te = np.arange(n_train), np.arange(n_test)
-    y_train =  np.squeeze(y_clf[train_ind, w_j])[rifperm_tr]
-    y_test = y_cross[test_ind,:][rifperm_te,:]
-    y_true = y[test_ind,:][rifperm_te,:]
+    y_train =  np.squeeze(y_clf[train_ind, w_j])
+    y_test = y_cross[test_ind,:]
+    y_true = y[test_ind,:]
     #print('train_ind:{}\ntest_ind:{}'.format(len(train_ind),len(test_ind)))
     
-    groups_train, groups_test = np.squeeze(groups[train_ind, w_j]), groups[test_ind]
+    groups_train, _ = np.squeeze(groups[train_ind, w_j]), groups[test_ind]
     del(X, groups) #removed y from this line.
     ###############################################################
     

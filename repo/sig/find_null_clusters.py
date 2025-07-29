@@ -1,4 +1,4 @@
-import sys
+import sys,os
 import numpy as np
 import copy 
 
@@ -91,28 +91,31 @@ def get_clusters(adj):
 if __name__ == '__main__':
     subject = sys.argv[1]
     print(subject)
-    thresh = np.float(sys.argv[2])
+    # thresh = float(sys.argv[2])
+    exp = str(sys.argv[2])
     train_subject='-subject'
-    # thresh=0.55
+    thresh=0.55
     ## time points for plot
     times_ = np.arange(0,960,10)
     n_times, mask_dist_= len(times_), 25
-    datapath='/project_data/volume0/tpirnia/thesis_repository/results/TG/'
-        #out_fname = (datapath +'clusters//{}_trained{}{}'.format(subject, subject, '-null'))
+    # datapath='/project_data/volume0/tpirnia/thesis_repository/results/TG/'
+    # set to present working directory
+    datapath=f'../../results/TG_{exp}'
+    #out_fname = (datapath +'clusters//{}_trained{}{}'.format(subject, subject, '-null'))
     out_fname = (datapath 
-                 + 'clusters/' 
+                 + '/clusters/' 
                  + '{}_threshold_accuracy_{}/{}_trained{}{}'.format( 'null',
                                                    thresh,
                                                    subject, 
                                                    train_subject, 
                                                    '-null'))
 
-    
+    os.makedirs(os.path.dirname(out_fname), exist_ok=True)
     # 2.0 - load each permutation
     nulls = load_tg(subject, 
                     train_subject,
                     suffix='-null',
-                    pathname=datapath+'null/')
+                    pathname=datapath+'/null/')
 
     n_permutations = nulls.shape[1]
     

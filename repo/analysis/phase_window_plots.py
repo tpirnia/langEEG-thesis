@@ -21,7 +21,8 @@ class Config:
     def create_default(cls) -> 'Config':
         subjects = "EP03 EP05 EP06 EP07 EP09 EP10 EP11 EP12 EP13 EP14 EP15 EP16 EP17 EP18 EP19 EP20 EP21 EP22 EP23 EP25 EP26 EP27 EP28 EP29 EP30 EP31 EP32 EP33".split()
         # subjects = ["EP07"]
-        project_path = Path('/project_data/volume0/tpirnia/thesis_repository')
+        # project_path = Path('/project_data/volume0/tpirnia/thesis_repository')
+        project_path = Path('/Users/tpirnia/Library/CloudStorage/Dropbox/Repository/LanguageProduction/COPY_FROM_SERVER') # need to change
         times = np.arange(0, 960, 10)
         mask_distance = 25
         
@@ -67,7 +68,7 @@ class TemporalGeneralization:
     
     def load_data(self, test_subject: str, trained_by: str) -> np.ndarray:
         """Load temporal generalization data."""
-        fname = self.config.project_path / 'results' / 'TG' / f'{test_subject}_trained-{trained_by}.npy'
+        fname = self.config.project_path / 'results' / 'TG_phase' / f'{test_subject}_trained-{trained_by}.npy'
         return np.load(fname)
     
     def apply_mask(self, data: np.ndarray) -> np.ndarray:
@@ -169,8 +170,8 @@ class Visualizer:
         cat_type = pd.CategoricalDtype(categories=self.config.subjects, ordered=True)
         df['test_subject'] = df['test_subject'].astype(cat_type)
         
-        training_data = set(df['training_data'][::-1])
-        cat_type = pd.CategoricalDtype(categories=training_data, ordered=True)
+        # training_data = set(df['training_data'][::-1])
+        cat_type = pd.CategoricalDtype(categories=['within participant', 'across participants (LOO)'], ordered=True)
         df['training_data'] = df['training_data'].astype(cat_type)
         
         return df
@@ -211,7 +212,7 @@ class Visualizer:
             """Create and save histogram visualization of test time distributions."""
             subtitles = ['within participant classification', 
                         'across participants - LOO classification']
-
+            cbar = ['#FF9933', '#FF4D4D']
             with mpl.rc_context(self.config.plot_params):
                 plt.style.use(['seaborn-v0_8-darkgrid', 'seaborn-v0_8-poster'])
 
@@ -220,7 +221,11 @@ class Visualizer:
                     col="training_data",
                     height=5,
                     aspect=1.5, 
-                    hue="training_data"
+                    hue="training_data",
+                    palette={
+                        'within participant': '#FF9933',
+                        'across participants (LOO)': '#FF4D4D'
+                    }
                 )
 
                 g.map(
