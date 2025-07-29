@@ -102,7 +102,7 @@ def tg_plot(ax,
 
 if __name__ == '__main__':
     subject = sys.argv[1]
-    thresh = np.float(sys.argv[2])
+    thresh = float(sys.argv[2])
     train_subject='-loo'
     print(subject)
     

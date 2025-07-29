@@ -1,0 +1,234 @@
+import sys, os, time
+import numpy as np
+import pandas as pd
+from seglearn.transform import Segment
+from sklearn.model_selection import GridSearchCV, GroupKFold
+from classification.models import (
+    make_model,
+    predict_results,
+    prediction_accuracy,
+    load_fold_params,
+    save_fold_params,
+    make_model_with_params,
+)
+from data_handling.segment import tw_to_3d, target_to_2d, target_to_1d
+from filelock import FileLock  # added 04/25/22
+import gc
+
+
+def classify(
+    w_j,
+    X_train,
+    y_train,
+    groups_train,
+    X_test,
+    y_test,
+    ind_subj,
+    inner_splits,
+    classifier,
+    subject,
+    suffix,
+    arg=None,
+    **_,
+):
+    """# input x, y of train  and x,y of test.
+    # grab x_train for a specific time window.
+    # k fold cv for parameter selection/training.
+    # train model with x_train
+    # use trained model to classify all windows for all subjects.
+    # output of results should be: [train_subj, clf, w, s, w_j, fld,
+    #             train_acc, test_subj, test_trial, test_acc{1,..,m}, permutation(np.nan)]
+    """
+
+    X_train, y_train, groups_train = get_segment(
+        w_j,
+        X_train,
+        y_train,
+        groups_train,
+    )
+    cv = list(GroupKFold(n_splits=inner_splits).split(X_train, y_train, groups_train))
+    mod_ = train(classifier, X_train, y_train, groups_train, cv)
+    save_fold_params(mod_.best_params_, arg, w_j, fld=0)
+    test_accuracy = test(mod_, X_test, y_test)
+
+    test_df = compile_results(
+        arg, w_j, mod_.best_score_, ind_subj, y_test, test_accuracy
+    )
+    save_df(test_df, arg, w_j)
+
+
+def classify_permute_presegmented(
+    w_j,
+    X_train_segments,
+    y_train_segments,
+    groups_train_segments,
+    train_idx,
+    X_test,
+    y_test,
+    ind_subj,
+    inner_splits,
+    classifier,
+    subject,
+    suffix,
+    arg=None,
+    **_,
+):
+    """Classification using presegmented training data."""
+
+    # get presegmented data and apply permutation indices
+    X_train_w = X_train_segments[w_j][
+        train_idx
+    ]  # shape: (n_permuted_trials, n_channels, arg.window)
+    y_train_w = y_train_segments[w_j][train_idx]  # shape: (n_permuted_trials,)
+    groups_train_w = groups_train_segments[w_j][
+        train_idx
+    ]  # Shape: (n_permuted_trials,)
+
+    # load saved parameters instead of training
+    best_params = load_fold_params(arg, w_j, fld=0)
+    mod_ = train(
+        classifier,
+        X_train_w,
+        y_train_w,
+        groups_train_w,
+        cv=None,
+        model_params=best_params,
+    )
+
+    test_accuracy = test(mod_, X_test, y_test)
+
+    perm_id = getattr(arg, "ith_perm", 0)
+    test_df = compile_results(
+        arg,
+        w_j,
+        mod_.score(X_train_w, y_train_w),
+        ind_subj,
+        y_test,
+        test_accuracy,
+        perm=perm_id,
+    )
+    save_df(test_df, arg, w_j)
+
+
+def get_segment(w_j, X, y, groups):
+    """input:
+    - X: 4 dimensions: [n_trials, n_windows, n_channels, n_timepoints]
+    - y: 2 dimensions: [n_trials, n_windows]
+    - groups: 2 dimensions: [n_trials, n_windows]
+    """
+    X = np.squeeze(X[:, w_j, :, :])
+    y = np.squeeze(y[:, w_j])
+    groups = np.squeeze(groups[:, w_j])
+    return X, y, groups
+
+
+def train(classifier, X_train, y_train, groups_train, cv, model_params=None):
+    if model_params:
+        modelCV = make_model_with_params(classifier, model_params)
+        trained_modelCV = modelCV.fit(X_train, y_train)
+    else:
+        modelCV = make_model(classifier, cv)
+        trained_modelCV = modelCV.fit(X_train, y_train)
+    return trained_modelCV
+
+
+def test(mod, X, y):
+    n_test = len(y)
+    X = tw_to_3d(X)
+    y = target_to_1d(y)
+    yhat = predict_results(mod, X, y)
+    test_accuracy = prediction_accuracy(y, yhat)
+    test_accuracy = target_to_2d(test_accuracy, n_test)
+    return test_accuracy
+
+
+def compile_results(
+    arg, w_j, train_accuracy, ind_subj, y_test, test_accuracy, y_inds=None, perm=np.nan
+):
+    # y test: one value for each trial (not including segments)
+    # n_test = len(ind_subj)
+    n_test = len(y_test[:, 0])  # added on 12/13/22
+    if hasattr(arg, "ith_perm"):
+        perm = arg.ith_perm
+    if "loo" in arg.fstem:
+        train_subject = "loo"
+    else:
+        train_subject = arg.subject
+    test_out = list(
+        map(
+            list,
+            zip(
+                [arg.subject] * n_test,
+                [arg.classifier] * n_test,
+                [arg.window] * n_test,
+                [arg.step] * n_test,
+                [w_j] * n_test,
+                [train_accuracy] * n_test,
+                [train_subject] * n_test,  # ignored
+                np.arange(n_test),
+                y_test[:, 0],
+                [perm] * n_test,
+            ),
+        )
+    )
+    columns = col_names(arg)
+    test_df = pd.DataFrame(np.hstack((test_out, test_accuracy)), columns=columns)
+    return test_df
+
+
+def col_names(arg):
+    """train_subj, clf, w, s, w_j, fld, train_acc, test_subj,
+    test_trial_num, test_trial_val, test_acc{1,..,m}, permutation_number"""
+    t_windows = np.arange(0, arg.t_end - arg.window, arg.step)
+    t_starts = [i + str(j) for i, j in zip(["t_"] * len(t_windows), t_windows)]
+
+    df_cols = np.concatenate(
+        (
+            [
+                "subject",
+                "classifier",
+                "window",
+                "step",
+                "w_train",
+                "train_accuracy",
+                "train_subject",
+                "test_trial_num",
+                "test_trial_val",
+                "permutation",
+            ],
+            t_starts,
+        )
+    )
+    return df_cols
+
+
+def save_df(test_df, arg, w_j):
+    test_df = test_df.apply(pd.to_numeric, errors="ignore")
+
+    group_cols = ["subject", "classifier", "window", "step", "w_train", "train_subject"]
+    if "permutation" in test_df.columns and not test_df["permutation"].isna().all():
+        group_cols.append("permutation")
+        group_fname = os.path.join(
+            arg.project_path,
+            "results",
+            "permutations",
+            arg.fstem,
+            f"{arg.subject}_{arg.classifier}_accuracy.csv",
+        )
+    else:
+        group_fname = os.path.join(arg.project_path, "results", f"{arg.fstem}.csv")
+
+    drop_cols = ["test_trial_val", "test_trial_num"]
+    acc_agg = test_df.groupby(by=group_cols, as_index=False).mean(numeric_only=True)
+    acc_agg = acc_agg.drop(columns=drop_cols)
+
+    pd_to_csv(group_fname, acc_agg)
+
+
+def pd_to_csv(fname, df, header=False):
+    os.makedirs(os.path.dirname(fname), exist_ok=True)
+    with FileLock(fname + ".lock"):
+        if not os.path.exists(fname):
+            header = True
+        with open(fname, "a+") as f:
+            df.to_csv(f, header=header, index=False)

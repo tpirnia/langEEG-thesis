@@ -1,0 +1,18 @@
+# Comparison of classifier performance. (Exp.1)
+# ttest between pairs of classifiers for 1000ms window classification.
+# outpput from: python repo/phase_results_compare_classifiers.py -results_file phase_accuracy_w1000.csv -figure_name phase_plot_accuracy_by_classifier -ttest >> ttests.txt
+
+Ridge Regression v. Linear SVM: [0.09, 0.9305877309]
+Ridge Regression v. Decision Tree: [6.94, 0.0000001877]
+Linear SVM v. Decision Tree: [6.18, 0.0000013316]
+
+# Comparison of full trial vs 'lexical selection' window (Experiment 2)
+# ttest between test accuracy results from 1000ms and 350ms window classification.
+# outpput from: python repo/phase_results_compare_windows.py  -results_files phase_accuracy_w1000.csv phase_accuracy_w350.csv -figure_name phase_plot_accuracy_by_window -ttest >> ttests.txt
+
+T-test results for Ridge Regression:
+1000 v. 350: [6.24, 0.0000011161]
+
+
+
+

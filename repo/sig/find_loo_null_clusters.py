@@ -98,7 +98,7 @@ def format_null(nl, thresh, mask):
 
 if __name__ == '__main__':
     subject = sys.argv[1]
-    thresh = np.float(sys.argv[2])
+    thresh = float(sys.argv[2])
     train_subject='-loo'
     print(subject)
 
@@ -107,7 +107,7 @@ if __name__ == '__main__':
     n_times, mask_dist_= len(times_), 25
 
 
-       datapath='/project_data/volume0/tpirnia/data/EEGWS/thesis_repository/results/TG/'
+    datapath='/project_data/volume0/tpirnia/data/EEGWS/thesis_repository/results/TG/'
 
     out_fname = (datapath 
                  + 'clusters/' 

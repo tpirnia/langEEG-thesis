@@ -41,7 +41,7 @@ params = {'lines.markersize':6,
 if __name__ == '__main__':
     subject = sys.argv[1]
     
-    thresh = np.float(sys.argv[2])
+    thresh = float(sys.argv[2])
     datapath='/project_data/volume0/tpirnia/thesis_repository/results/TG/'
     train_subject='-subject'
     # if (len(sys.argv)>3) and (sys.argv[3]=='loo'):

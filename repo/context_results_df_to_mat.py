@@ -9,9 +9,20 @@ WINDOW, STEP = 50, 10
 RESULTS_PATH = '/project_data/volume0/tpirnia/thesis_repository/results'
 SUBJECT_LIST = "EP03 EP05 EP06 EP07 EP09 EP10 EP11 EP12 EP13 EP14 EP15 EP16 EP17 EP18 EP19 EP20 EP21 EP22 EP23 EP25 EP26 EP27 EP28 EP29 EP30 EP31 EP32 EP33".split()
 
-def process_and_save_data(input_fname, trained_type, subject=None):
+def process_and_save_data(input_fname, trained_type, subject=None, t_start=0):
+    '''
+    Process and save data for a single subject from dataframe of accuracy results for 50ms window, 10ms step sliding window.
+    t_start: the time (in ms) at which to start looking at classification accuracy. Defaults to 0--the time of stimulus onset.
+    '''
+    w_t0, t_0 = t_start + 50, t_start + 500 # this is only true for 50ms window and 10ms step
     df = pd.read_csv(input_fname)
-    df = df[df['w_train'] >= 50]
+    if 'Unnamed: 0' in df.columns:
+        df.drop(columns=['Unnamed: 0'], inplace=True)
+    df.drop_duplicates(inplace=True)
+    df.reset_index(inplace=True,drop=True)
+
+    df = df[df['w_train'] >= w_t0] # remove windows that start before t0
+
     df = (df.groupby(["w_train", "subject"], as_index=False)
          .mean(numeric_only=True)
          .drop_duplicates()
@@ -20,7 +31,7 @@ def process_and_save_data(input_fname, trained_type, subject=None):
     for subj in subjects_to_process:
         if subj not in SUBJECT_LIST:
             raise ValueError(f"Subject {subj} not in subject list")
-        time_data = df[df['subject'] == subj].loc[:, 't_500':'t_1450']
+        time_data = df[df['subject'] == subj].loc[:, f't_{t_0}':'t_1450']
         print(f"{subj}: {time_data.shape}")
         np.save(f"{out_dir}{subj}_trained-{trained_type}.npy", time_data)
 
@@ -42,6 +53,6 @@ if __name__ == "__main__":
         process_and_save_data(US_fname, "US-US")
     elif args.trained=='phonological':
         process_and_save_data(UP_fname, "UP-UP")
-    elif arg.trained=='both':
+    elif args.trained=='both':
         process_and_save_data(US_fname, "US-US")
         process_and_save_data(UP_fname, "UP-UP")

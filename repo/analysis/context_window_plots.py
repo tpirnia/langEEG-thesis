@@ -1,0 +1,339 @@
+from pathlib import Path
+from dataclasses import dataclass
+from typing import List, Dict, Tuple, Optional
+import numpy as np
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+import matplotlib as mpl
+from matplotlib import colors
+from copy import deepcopy
+from itertools import product
+
+@dataclass
+class Config:
+    subjects: List[str]
+    project_path: Path
+    times: np.ndarray
+    mask_distance: int
+    plot_params: Dict
+    experiment_params: Dict
+
+    @classmethod
+    def create_default(cls) -> 'Config':
+        subjects = "EP03 EP05 EP06 EP07 EP09 EP10 EP11 EP12 EP13 EP14 EP15 EP16 EP17 EP18 EP19 EP20 EP21 EP22 EP23 EP25 EP26 EP27 EP28 EP29 EP30 EP31 EP32 EP33".split()
+        # subjects = ["EP07"]
+        project_path = Path('/Users/tpirnia/Library/CloudStorage/Dropbox/Repository/LanguageProduction/COPY_FROM_SERVER/') # need to change
+        times = np.arange(0, 960, 10)
+        mask_distance = 25
+        
+        plot_params = {
+            'lines.markersize': 6,
+            'axes.labelsize': 20,
+            'axes.titlesize': 20,
+            'axes.labelpad': 8,
+            'xtick.labelsize': 16,
+            'ytick.labelsize': 16,
+            'xtick.major.pad': 7,
+            'ytick.major.pad': 6,
+            'legend.labelspacing': .5,
+            'legend.handletextpad': .175,
+            'legend.title_fontsize': 20,
+            'legend.fontsize': 20,
+            'figure.figsize': (8, 10),
+            'figure.subplot.hspace': .95,
+            'figure.subplot.wspace': .95,
+            'image.origin': 'lower',
+            'figure.autolayout': False,
+            'scatter.marker': 'o',
+            'savefig.dpi': 450,
+            'savefig.bbox': 'tight',
+            'savefig.transparent': True,
+        }
+        experiment_params = {
+            "US-US": {
+            "fname": "context_accuracy_US-US_w1000",
+            "tg_path":"TG_context",
+            "figure_title": "Unrelated vs Semantically-related",
+            "suffix": "US-US",
+            "cmap": [
+                {"face": "#765F1C", "hatch": "#7A6003"},
+                {"face": "#FED231", "hatch": "#F5D053"},
+            ],
+            "Test Classification": "Within Context",
+            "Train Set": "Unrelated vs Semantic",
+            "Test Set": "Unrelated vs Semantic",
+            "Label": r"$US \rightarrow US$",
+            "within_condition": 2,
+            "across_condition": 2,
+            "classifier": "SVM",
+            },
+            "UP-UP": {
+                "fname": "context_accuracy_UP-UP_w1000",
+                "tg_path":"TG_context",
+                "figure_title": "Unrelated vs Phonologically-related",
+                "suffix": "UP-UP",
+                "cmap": [
+                    {"face": "#0e9d6d", "hatch": "#0e9d6d"},
+                    {"face": "#0eaa75", "hatch": "#0eaa75"},
+                ],
+                "Test Classification": "Within Context",
+                "Train Set": "Unrelated vs Phonological",
+                "Test Set": "Unrelated vs Phonological",
+                "Label": r"$UP \rightarrow UP$",
+                "within_condition": 1,
+                "across_condition": 1,
+                "classifier": "SVM",
+            },
+        }
+
+        return cls(subjects, project_path, times, mask_distance, plot_params,experiment_params)
+
+class TemporalGeneralization:
+    def __init__(self, config: Config):
+        self.config = config
+        self.mask_matrix = self._create_mask_matrix()
+    
+    def _create_mask_matrix(self) -> np.ndarray:
+        """Create mask matrix for temporal generalization."""
+        n_times = len(self.config.times)
+        mask = np.zeros((n_times, n_times))
+        for i, j in product(range(n_times), range(n_times)):
+            if abs(i - j) > self.config.mask_distance:
+                mask[i, j] = 1
+        return mask
+    
+    def load_data(self, test_subject: str,  tg_path: str, trained_by: str) -> np.ndarray:
+        """Load temporal generalization data."""
+        fname = self.config.project_path / 'results' / tg_path / f'{test_subject}_trained-{trained_by}.npy'
+        return np.load(fname)
+    
+    def apply_mask(self, data: np.ndarray) -> np.ndarray:
+        """Apply mask to temporal generalization matrix."""
+        masked_data = deepcopy(data)
+        masked_data[self.mask_matrix == 1] = 0
+        return masked_data
+    
+    def threshold(self, data: np.ndarray, threshold: float) -> np.ndarray:
+        """Apply threshold, set to np.nan where < thresholdto temporal generalization matrix."""
+        data[ np.where(data < threshold) ] = np.nan
+        return data
+    
+    def find_max_along_test_time(self, data: np.ndarray, threshold: float) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+        """Find maximum values along test time dimension."""
+        inds = np.where(data.max(axis=0) > threshold)[0]
+        argmax_tr = data.argmax(axis=0)
+        max_tr = data.max(axis=0)
+        thresh_test_times = self.config.times[inds]
+        thresh_train_times = self.config.times[argmax_tr[inds]]
+        thresh_acc = max_tr[inds]
+        return thresh_acc, thresh_train_times, thresh_test_times
+    
+    def get_peaks(self, thresh_acc: np.ndarray, thresh_train_time: np.ndarray, 
+                 thresh_test_times: np.ndarray) -> Tuple[float, float, float]:
+        """Get peak accuracy and corresponding times."""
+        ind_peak = np.argmax(thresh_acc)
+        return (thresh_acc[ind_peak], 
+                thresh_train_time[ind_peak], 
+                thresh_test_times[ind_peak])
+
+class DataProcessor:
+    def __init__(self, config: Config):
+        self.config = config
+        self.tg = TemporalGeneralization(config)
+    
+    def process_subject(self, subject: str, tg_path: str, trained_by: list) -> Tuple[List, List]:
+        """Process data for a single subject."""
+        exps_results = {} # where exp_results = {exp1_results, exp2_results}
+        
+        # Load data
+        for exp in trained_by:
+            exps_results[exp] = []
+            exp_data = self.tg.load_data(subject, tg_path, exp)
+        
+            # Process within-subject data
+            exp_masked = self.tg.apply_mask(exp_data)
+            exp_thresh = (
+                self.tg.find_max_along_test_time(exp_masked, 0.55),
+                self.tg.find_max_along_test_time(exp_masked, 0.60)
+            )
+            
+            if len(exp_thresh[0][0]) > 0:
+                peaks = self.tg.get_peaks(*exp_thresh[0])
+                exps_results[exp].append([
+                    subject, subject, 
+                    len(exp_thresh[0][0]), len(exp_thresh[1][0]),
+                    *peaks
+                ])
+        # return each value inside of exps_results separately
+        return exps_results[trained_by[0]], exps_results[trained_by[1]]
+
+class Visualizer:
+    def __init__(self, config: Config,experiments: list):
+        self.config = config
+        self.cbars = list(
+            config.experiment_params[exp_name]["cmap"][1] for exp_name in experiments
+            )
+        self.exp_data = list(config.experiment_params[exp_name]["Train Set"] for exp_name in experiments)
+    def create_dataframe(self, expA_data: List, expB_data: List) -> pd.DataFrame:
+        """Create and format DataFrame from results."""
+        cols = ['test_subject', 'train_subject', 'n_thresh55', 'n_thresh60',
+                'acc_train_peak', 't_train_peak', 't_test_peak']
+
+        expA_df = pd.DataFrame(expA_data, columns=cols)
+        expB_df = pd.DataFrame(expB_data, columns=cols)
+
+        expA_df['Experiment'] = self.exp_data[0]
+        expB_df['Experiment'] = self.exp_data[1]
+
+        df = pd.concat([expA_df, expB_df])
+
+        # Format categorical columns
+        # cat_type = pd.CategoricalDtype(categories=self.config.subjects, ordered=True)
+        # df['train_subject'] = df['train_subject'].astype(cat_type)
+
+        # cat_type = pd.CategoricalDtype(categories=self.config.subjects, ordered=True)
+        # df['test_subject'] = df['test_subject'].astype(cat_type)
+
+        # exp_cat = set(df['Experiment'][::-1])
+        exp_cat = [self.exp_data[0], self.exp_data[1]]
+        cat_type = pd.CategoricalDtype(categories=exp_cat, ordered=True)
+        df['Experiment'] = df['Experiment'].astype(cat_type)
+
+        return df
+
+    def create_plot(self, df: pd.DataFrame, save_path: Path) -> None:
+        """Create and save visualization."""
+        with mpl.rc_context(self.config.plot_params):
+            plt.style.use(['seaborn-v0_8-darkgrid', 'seaborn-v0_8-poster'])
+            fig, ax = plt.subplots(figsize=(8.7, 5.27))
+            plt.ylim(0, 1)
+
+            sns.barplot(
+                y='acc_train_peak',
+                x='Experiment',
+                data=df,
+                ax=ax,
+                errwidth=3,
+                errorbar=('ci', 95)
+            )
+            locs, _ = plt.yticks()
+            ax.xaxis.labelpad = 17
+            ax.set(
+                ylabel='peak test accuracy (%)',
+                yticks=locs,
+                yticklabels=list(map(int, locs * 100)),
+                xlabel=''
+            )
+            # sort patches by x-position
+            patches_sorted = sorted(ax.patches, key=lambda p: p.get_x())
+            for i, bar in enumerate(patches_sorted):
+                bar.set_hatch('//')
+                bar._hatch_color = colors.to_rgba(self.cbars[i]['hatch'], alpha=1) 
+                bar.set_facecolor(colors.to_rgba(self.cbars[i]['face'], alpha=1))
+
+            plt.savefig(save_path, dpi=450, bbox_inches="tight")
+            plt.close()
+
+    def create_histogram_plot(self, df: pd.DataFrame, save_path: Path,) -> None:
+        """Create and save histogram visualization of test time distributions."""
+        subtitles = ['Unrelated vs Semantic', 
+                        'Unrelated vs Phonological']
+
+        with mpl.rc_context(self.config.plot_params):
+            plt.style.use(['seaborn-v0_8-darkgrid', 'seaborn-v0_8-poster'])
+
+            g = sns.FacetGrid(
+                    df, 
+                    col="Experiment",
+                    height=5,
+                    aspect=1.5, 
+                    hue="Experiment"
+                )
+
+            g.map(
+                    sns.histplot,
+                    't_test_peak',
+                    stat='percent',
+                    binwidth=200,
+                    binrange=(0, 1000),
+                    edgecolor="white",
+                    linewidth=1
+                )
+
+            # Format each facet
+            for i, ax in enumerate([g.facet_axis(0,0), g.facet_axis(0,1)]):
+                # Set title and limits
+                ax.set_title(subtitles[i])
+                ax.set_ylim(0, 50)
+
+                # Add percentage labels on bars
+                for patch in ax.patches:
+                    patch.set_hatch('//')
+                    # patch._hatch_color = colors.to_rgba(self.cbars[i]['hatch'], alpha=1) 
+                    # patch.set_facecolor(colors.to_rgba(self.cbars[i]['face'], alpha=1))
+                    height = patch.get_height()
+                    # Determine text position and color
+                    if height == 0:
+                        vert_offset = 0.5
+                        text_color = 'gray'
+                    else:
+                        vert_offset = -3.5
+                        text_color = 'white'
+
+                    # Add text
+                    ax.text(
+                            x=patch.get_x() + (patch.get_width()/2),
+                            y=height + vert_offset,
+                            s=f'{height:.0f}%',
+                            ha='center',
+                            fontsize=20,
+                            color=text_color,
+                            fontweight="bold"
+                        )
+
+                # Set labels
+                ax.set_xlabel('test time (ms)', fontsize=20)
+                ax.set_ylabel('% of total subjects', fontsize=20)
+
+                # Adjust tick parameters
+                ax.tick_params(axis='both', pad=6)
+
+            plt.savefig(save_path, dpi=450, bbox_inches="tight")
+            plt.close()
+
+def main():
+    experiments = ['US-US', 'UP-UP']
+
+    # Initialize configuration
+    config = Config.create_default()
+    # Initialize processors
+    processor = DataProcessor(config)
+    visualizer = Visualizer(config,experiments)
+    
+    # Process data
+    USUS_results = []
+    UPUP_results = []
+    
+    for subject in config.subjects:
+        USUS_data, UPUP_data = processor.process_subject(subject,'TG_context', experiments)
+        USUS_results.extend(USUS_data)
+        UPUP_results.extend(UPUP_data)
+    
+    # Create DataFrame
+    df = visualizer.create_dataframe(USUS_results, UPUP_results)
+    
+    # Create visualizations
+    visualizer.create_plot(
+        df, 
+        config.project_path / 'results' / 'figures' / 'Context-3-Comparison_of_Peak_Acuracy_Within_vs_Across_Participants.png',
+    )
+    
+    visualizer.create_histogram_plot(
+        df,
+        config.project_path / 'results' / 'figures' / 'Context-4-Distribution_of_Peak_Test_Time_Within_vs_Across_Participants.png'
+    )
+
+
+if __name__ == "__main__":
+    main()

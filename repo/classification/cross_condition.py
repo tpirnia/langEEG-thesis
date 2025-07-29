@@ -2,86 +2,116 @@ import sys, os, copy
 import numpy as np
 from functools import reduce
 
+import numpy as np
+
+def _ensure_1d(arr):
+    """Ensure array is 1D by taking first column if 2D."""
+    return arr[:, 0] if arr.ndim == 2 else arr
+
+
 class conflictConditions(): #change later to crossContext
-    def __init__(self,  cross_condition, y):
-        within_condition = set(y).difference([0,cross_condition]).pop()
-
-        self.within = {'y':  within_condition,
-                       'y_clf': 1,
-                      }
-
-        self.cross = {'y': cross_condition,
-                      'y_clf': 2, 
-                     }
-
-        self.lc = {'y': 0,
-                   'y_clf': -1, #if I do log, it needs to be changed to 0
-                  }
+    def __init__(self, cross_condition, y):
+        within_condition = set(y).difference([0, cross_condition]).pop()
+        
+        self.within = {'y': within_condition, 'y_clf': 1}
+        self.cross = {'y': cross_condition, 'y_clf': 2}
+        self.lc = {'y': 0, 'y_clf': -1}
 
     def __iter__(self):
         for key in self.__dict__.keys():
             yield (key, self.__dict__[key])
 
     def __str__(self):
-        clf_labels = "high-conflict:\n\twithin:\ty = {}\ty_clf = {}\n\tcross:\ty = {}\ty_clf = {}\n\nlow-conflict:\ty = {}\ty_clf = {}".format(self.within['y'],
-                                                                                                                         self.within['y_clf'],
-                                                                                                                         self.cross['y'],
-                                                                                                                         self.cross['y_clf'],
-                                                                                                                         self.lc['y'],
-                                                                                                                         self.lc['y_clf'])
+        clf_labels = f"high-conflict:\n\twithin:\ty = {self.within['y']}\ty_clf = {self.within['y_clf']}\n\tcross:\ty = {self.cross['y']}\ty_clf = {self.cross['y_clf']}\n\nlow-conflict:\ty = { self.lc['y']}\ty_clf = {self.lc['y_clf']}"
         return clf_labels
     
     def _add_loc(self, y):
-        for key in self.__dict__.keys():#items():
+        for key in self.__dict__.keys():
             if 'y' in self.__dict__[key]:
                 ky = self.__dict__[key]['y']
                 loc = np.where(y==ky)[0]
                 self.__dict__[key].update({'loc':loc})
                 self.__dict__[key].update({'count':len(loc)})
 
-    def _get_ylabels(self, y):
-        y_tmp = copy.deepcopy(y)
-        y_tmp[self.within['loc']] = self.within['y_clf']
-        y_tmp[self.cross['loc']] = self.cross['y_clf']
-        y_tmp[self.lc['loc']] = self.lc['y_clf']
-        print('get_ylabels({}) -> {}.'.format(np.unique(y),np.unique(y_tmp)))
-        return y_tmp
-
-    def _relabel(self, y_clf):
-        within_y = self.within['y_clf']
-        y_tmp = copy.deepcopy(y_clf)
-        y_tmp[self.cross['loc']] = within_y
-        y_tmp[self.within['loc']] = within_y
-        print('cross_relabel({}) -> {}'.format(np.unique(y_clf),np.unique(y_tmp)))
-        return y_tmp
-
-    def cross_split(self, y, trte):
-        """
-        Run after ._add_loc(y)
-        """
-        tr_tmp,te = zip(*trte)
-        tr = list(tr_f[np.isin(tr_f, self.cross['loc'], invert=True)] for tr_f in tr_tmp)
-        tr_cross= list(tr_f[np.isin(tr_f, self.cross['loc'])] for tr_f in tr_tmp)
-
-        trte = list(zip(tr,te))
-        self.cross['excluded_tr'] = tr_cross
-        return trte
-    
-    def relabel_classes(self, y, trte):
-        self._add_loc(y)
-        y_class = self._get_ylabels(y)
-        y_cross = self._relabel(y_class)
-        splits = self.cross_split(y, trte)
+    def get_fold_labels(self, y, groups, fold_idx, perm_indices=None, test_folds=[2, 1, 0]):
+        """Get train/test labels for a specific fold, optionally permuted.
         
-        return splits, y_cross, y_class
+        Returns raw labels before relabeling - use with relabel_classes() workflow.
+        """
+        y_1d = _ensure_1d(y)
+        groups_1d = _ensure_1d(groups)
+        test_fold = test_folds[fold_idx]
+        
+        # Create filtered datasets (same logic as your original)
+        within_mask = y_1d != self.cross['y']
+        cross_mask = y_1d != self.within['y']
+        
+        y_within = y[within_mask]
+        y_cross = y[cross_mask]
+        groups_within = groups_1d[within_mask]
+        groups_cross = groups_1d[cross_mask]
+        
+        # Apply permutation if provided
+        if perm_indices is not None:
+            y_within = y_within[perm_indices]
+            y_cross = y_cross[perm_indices]
+        
+        # Get train/test splits
+        train_labels = y_within[groups_within != test_fold]
+        test_labels = y_cross[groups_cross == test_fold]
+        
+        return train_labels, test_labels
 
-    def permute_relabel_classes(self, y, trte):
-        self._add_loc(y)
-        y_class = self._get_ylabels(y)
-        y_cross = self._relabel(y_class)
-        splits = self.cross_split(y, trte)
-        return splits, y_cross, y_class
+    def get_fold_indices(self, y, groups, fold_idx, test_folds=[2, 1, 0]):
+        """Get original indices for train/test trials in a fold.
+        
+        Use this to index into X for getting train/test data.
+        """
+        y_1d = _ensure_1d(y)
+        groups_1d = _ensure_1d(groups)
+        test_fold = test_folds[fold_idx]
+        
+        # Get original indices
+        within_indices = np.where(y_1d != self.cross['y'])[0]
+        cross_indices = np.where(y_1d != self.within['y'])[0]
+        
+        # Filter by fold
+        within_groups = groups_1d[within_indices]
+        cross_groups = groups_1d[cross_indices]
+        
+        train_idx = within_indices[within_groups != test_fold]
+        test_idx = cross_indices[cross_groups == test_fold]
+        
+        return train_idx, test_idx
+
+    def relabel_for_classifier(self, y_, clf_type='default'):
+        y_1d = _ensure_1d(y_)
+        if len(set(y_1d)) == 3:
+            print('Relabeling both high conflict states to the same label value.')
+        y_relabeled = y_.copy()
+
+        is_lc = (y_1d == min(y_1d))
+
+        if clf_type == 'svm':
+            y_relabeled[is_lc], y_relabeled[~is_lc] = -1, 1
+        elif clf_type == 'log':
+            y_relabeled[is_lc], y_relabeled[~is_lc] = 0, 1
+        else:  # default
+            y_relabeled[is_lc] = self.lc['y_clf']
+            y_relabeled[~is_lc] = self.within['y_clf']
+
+        return y_relabeled
     
+    def get_fold_labels_relabeled(self, y, groups, fold_idx, test_folds=[2, 1, 0], perm_indices=None,clf_type='default'):
+        """
+        Get train/test labels for a fold, optionally permuted and relabeled for classifier.
+        """
+        train_labels, test_labels = self.get_fold_labels(y, groups, fold_idx, perm_indices, test_folds=test_folds)
+        train_labels = self.relabel_for_classifier(train_labels, clf_type=clf_type)
+        test_labels = self.relabel_for_classifier(test_labels, clf_type=clf_type)
+        return train_labels, test_labels
+
+
 def filter_train_test_2y(fold, y, y2, trte_index):
     y2 = y2[:, 0] if y2.ndim > 1 else y2
     y = y[:, 0] if y.ndim > 1 else y

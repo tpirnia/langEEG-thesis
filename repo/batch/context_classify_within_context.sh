@@ -10,6 +10,7 @@
 classifier=$1
 subject=$2
 window=$3
+additional_args=$4
 contexts="US UP"
 
 PROJECT_PATH=/project_data/volume0/tpirnia/thesis_repository
@@ -22,7 +23,7 @@ echo `date`
 echo jobid ${SLURM_JOBID} cpupernode ${SLURM_JOB_CPUS_PER_NODE}
 cd ${PROJECT_PATH}
 for context_type in $contexts; do
-    line="repo/context_classify_within_context.py -c $classifier -s $subject -w $window --context $context_type"
+    line="repo/context_classify_within_context.py -c $classifier -s $subject -w $window --context $context_type $additional_args"
     echo $line
     /home/tpirnia/miniconda3/envs/pynew/bin/python ${line}
 duration=$SECONDS

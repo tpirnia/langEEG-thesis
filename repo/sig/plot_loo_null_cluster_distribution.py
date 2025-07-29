@@ -46,7 +46,7 @@ if __name__ == '__main__':
     subject = sys.argv[1]
     train_subject = '-loo'
     
-    thresh = np.float(sys.argv[2])
+    thresh = float(sys.argv[2])
     print(subject)
     
     

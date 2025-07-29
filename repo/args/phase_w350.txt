@@ -8,5 +8,6 @@
   "window": 350,
   "step": 100,
   "inner_splits": 5,
-  "outer_splits": 5
+  "outer_splits": 5,
+  "splitter": "groupkfold"
   }
