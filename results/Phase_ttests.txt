@@ -12,3 +12,7 @@ Linear SVM v. Decision Tree: [6.18, 0.0000013316]
 
 T-test results for Ridge Regression:
 1000 v. 350: [6.24, 0.0000011161]
+
+
+
+
