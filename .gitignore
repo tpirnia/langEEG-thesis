@@ -177,3 +177,14 @@ dmypy.json
 # Cython debug symbols
 cython_debug/
 
+<<<<<<< Updated upstream
+=======
+# System files
+.DS_Store
+Thumbs.db
+.vscode/
+.DS_Store
+.DS_Store
+.DS_Store
+.DS_Store
+>>>>>>> Stashed changes
