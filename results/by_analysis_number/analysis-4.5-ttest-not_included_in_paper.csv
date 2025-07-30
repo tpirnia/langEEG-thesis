@@ -1,0 +1,4 @@
+Test,Mean,SD,95% CI Lower,95% CI Upper,t-value,P-value,N,FDR P-value,Significant,Note
+within participant vs Chance,72.7,10.2,68.6,76.7,11.62,0.0,28,0.0,True,
+across participants vs Chance,56.8,6.3,54.3,59.3,5.62,0.0,28,0.0,True,
+within participant - across participants,15.9,10.8,11.6,20.2,7.62,0.0,28,0.0,True,
