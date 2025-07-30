@@ -1,4 +1,4 @@
-Test,Mean,SD,95% CI Lower,95% CI Upper,t-value,P-value,N,FDR P-value,Significant,Note
-350 vs Chance,58.1,7.9,55.0,61.2,5.32,1e-05,28,1e-05,True,
-1000 vs Chance,72.7,10.2,68.6,76.7,11.62,0.0,28,0.0,True,
-350 - 1000,-14.6,11.7,-19.2,-10.0,-6.48,0.0,28,0.0,True,
+Test,Mean,SD,95% CI Lower,95% CI Upper,t-value,P-value,N,FDR P-value,Significant
+350 vs Chance,58.1,7.9,55.0,61.2,5.32,1e-05,28,1e-05,True
+1000 vs Chance,72.7,10.2,68.6,76.7,11.62,<0.00005,28,<0.00005,True
+350 - 1000,-14.6,11.7,-19.2,-10.0,-6.48,<0.00005,28,<0.00005,True

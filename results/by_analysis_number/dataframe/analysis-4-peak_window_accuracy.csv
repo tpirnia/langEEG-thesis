@@ -1,0 +1,57 @@
+Participant,Train Data,time windows above 55% threshold,n_thresh60,time at peak accuracy,peak train accuracy,time at peak test accuracy
+EP03,LOO (all data except test participant),95,40,170,0.7,100
+EP05,LOO (all data except test participant),87,50,410,0.7166666666666667,300
+EP06,LOO (all data except test participant),93,52,250,0.7,160
+EP07,LOO (all data except test participant),96,63,840,0.75,820
+EP09,LOO (all data except test participant),89,16,330,0.65,160
+EP10,LOO (all data except test participant),96,66,600,0.7,610
+EP11,LOO (all data except test participant),94,57,150,0.6833333333333333,0
+EP12,LOO (all data except test participant),95,63,820,0.7166666666666667,590
+EP13,LOO (all data except test participant),96,80,840,0.7333333333333333,760
+EP14,LOO (all data except test participant),91,58,270,0.7,360
+EP15,LOO (all data except test participant),92,43,10,0.7,40
+EP16,LOO (all data except test participant),83,22,440,0.65,540
+EP17,LOO (all data except test participant),92,36,410,0.6833333333333333,430
+EP18,LOO (all data except test participant),95,81,660,0.7333333333333333,630
+EP19,LOO (all data except test participant),96,76,750,0.7166666666666667,940
+EP20,LOO (all data except test participant),96,88,450,0.75,320
+EP21,LOO (all data except test participant),95,60,740,0.6666666666666666,600
+EP22,LOO (all data except test participant),95,35,60,0.7,270
+EP23,LOO (all data except test participant),69,17,680,0.6833333333333333,640
+EP25,LOO (all data except test participant),96,78,700,0.7333333333333333,670
+EP26,LOO (all data except test participant),96,52,210,0.7,30
+EP27,LOO (all data except test participant),89,37,190,0.6833333333333333,50
+EP28,LOO (all data except test participant),95,50,500,0.7,700
+EP29,LOO (all data except test participant),96,67,820,0.7166666666666667,700
+EP30,LOO (all data except test participant),96,66,730,0.75,770
+EP31,LOO (all data except test participant),96,83,280,0.7,220
+EP32,LOO (all data except test participant),92,50,590,0.75,590
+EP33,LOO (all data except test participant),96,70,350,0.7166666666666667,390
+EP03,EP03,96,91,870,0.75,820
+EP05,EP05,96,57,550,0.7333333333333333,550
+EP06,EP06,96,82,790,0.7833333333333333,790
+EP07,EP07,96,96,550,0.9333333333333332,560
+EP09,EP09,88,68,840,0.7333333333333333,920
+EP10,EP10,96,96,650,0.9333333333333332,620
+EP11,EP11,96,83,400,0.75,460
+EP12,EP12,96,95,510,0.8166666666666667,510
+EP13,EP13,96,86,650,0.85,630
+EP14,EP14,96,92,490,0.8166666666666667,510
+EP15,EP15,96,84,260,0.7,220
+EP16,EP16,96,71,860,0.8,740
+EP17,EP17,91,74,430,0.7833333333333333,480
+EP18,EP18,93,87,290,0.8,290
+EP19,EP19,96,73,710,0.7666666666666667,710
+EP20,EP20,96,96,570,0.8333333333333334,580
+EP21,EP21,96,93,30,0.75,20
+EP22,EP22,96,75,400,0.7833333333333333,410
+EP23,EP23,96,77,460,0.8333333333333334,490
+EP25,EP25,88,62,650,0.9333333333333332,670
+EP26,EP26,96,96,420,0.75,440
+EP27,EP27,93,49,720,0.7166666666666667,840
+EP28,EP28,93,73,460,0.8333333333333334,480
+EP29,EP29,87,57,660,0.7166666666666667,590
+EP30,EP30,96,83,500,0.7333333333333333,410
+EP31,EP31,93,75,550,0.8,510
+EP32,EP32,96,79,840,0.7333333333333333,750
+EP33,EP33,95,69,890,0.7166666666666667,890
