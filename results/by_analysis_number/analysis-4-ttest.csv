@@ -1,0 +1,8 @@
+Test,Mean,95% CI Lower,95% CI Upper,t-value,P-value,N,FDR P-value,Significant,Note
+within participant vs Chance,0.726785714,0.686470936,0.767100492,11.555250402,0.0,28,0.0,True,
+across participants vs Chance,0.567857143,0.5431741,0.592540186,5.648983269,2.68e-06,28,2.68e-06,True,
+within participant - across participants,0.158928571,0.116151096,0.201706047,7.623041975,3.4e-08,28,3.4e-08,True,
+Test,Mean,95% CI Lower,95% CI Upper,t-value,P-value,N,FDR P-value,Significant,Note
+within participant vs Chance,0.726785714,0.686470936,0.767100492,11.624727156,0.0,28,0.0,True,
+across participants vs Chance,0.567857143,0.5431741,0.592540186,5.623720849,2.867e-06,28,2.867e-06,True,
+within participant - across participants,0.158928571,0.116151096,0.201706047,7.623041975,3.4e-08,28,3.4e-08,True,

@@ -1,0 +1,15 @@
+Test,Mean,95% CI Lower,95% CI Upper,t-value,P-value,N,FDR P-value,Significant,Note
+SVM vs Chance,0.697619048,0.655857762,0.739380333,9.756888105,0.0,28,,False,
+Linear SVM vs Chance,0.707738095,0.665948377,0.749527813,,,28,,False,
+Decision Tree vs Chance,0.595238095,0.554597799,0.635878391,4.834824576,2.3738e-05,28,,False,
+Ridge vs Chance,0.726785714,0.686470936,0.767100492,11.624727156,0.0,28,,False,
+SVM - Linear SVM,-0.010119048,-0.0317572,0.011519105,-0.959535286,0.345803593,28,,False,"Not tested: SVM, Linear SVM did not exceed chance"
+SVM - Decision Tree,0.102380952,0.070057402,0.134704502,6.498926112,5.75e-07,28,,False,"Not tested: SVM, Decision Tree did not exceed chance"
+SVM - Ridge,-0.029166667,-0.047998127,-0.010335206,-3.177929616,0.003698274,28,,False,"Not tested: SVM, Ridge did not exceed chance"
+Linear SVM - Decision Tree,0.1125,0.084488242,0.140511758,8.240501499,8e-09,28,,False,"Not tested: Linear SVM, Decision Tree did not exceed chance"
+Linear SVM - Ridge,-0.019047619,-0.033087478,-0.00500776,-2.783680823,0.009695173,28,,False,"Not tested: Linear SVM, Ridge did not exceed chance"
+Decision Tree - Ridge,-0.131547619,-0.162682826,-0.100412412,-8.669074151,3e-09,28,,False,"Not tested: Decision Tree, Ridge did not exceed chance"
+Test,Mean,95% CI Lower,95% CI Upper,t-value,P-value,N,FDR P-value,Significant,Note
+350 vs Chance,0.580952381,0.549649943,0.612254819,5.320436917,6.445e-06,28,6.445e-06,True,
+1000 vs Chance,0.726785714,0.686470936,0.767100492,11.624727156,0.0,28,0.0,True,
+350 - 1000,-0.145833333,-0.192023639,-0.099643028,-6.478097117,6.06e-07,28,6.06e-07,True,

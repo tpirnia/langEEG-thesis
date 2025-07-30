@@ -1,0 +1,113 @@
+Subject,Label,Test Accuracy,Source
+EP03,Decision Tree,0.4166666666666667,phase_accuracy_w1000.csv
+EP05,Decision Tree,0.6166666666666667,phase_accuracy_w1000.csv
+EP06,Decision Tree,0.7166666666666667,phase_accuracy_w1000.csv
+EP07,Decision Tree,0.8166666666666667,phase_accuracy_w1000.csv
+EP09,Decision Tree,0.5833333333333334,phase_accuracy_w1000.csv
+EP10,Decision Tree,0.7,phase_accuracy_w1000.csv
+EP11,Decision Tree,0.55,phase_accuracy_w1000.csv
+EP12,Decision Tree,0.5833333333333334,phase_accuracy_w1000.csv
+EP13,Decision Tree,0.75,phase_accuracy_w1000.csv
+EP14,Decision Tree,0.4833333333333333,phase_accuracy_w1000.csv
+EP15,Decision Tree,0.45,phase_accuracy_w1000.csv
+EP16,Decision Tree,0.6333333333333333,phase_accuracy_w1000.csv
+EP17,Decision Tree,0.55,phase_accuracy_w1000.csv
+EP18,Decision Tree,0.6,phase_accuracy_w1000.csv
+EP19,Decision Tree,0.55,phase_accuracy_w1000.csv
+EP20,Decision Tree,0.6833333333333333,phase_accuracy_w1000.csv
+EP21,Decision Tree,0.6,phase_accuracy_w1000.csv
+EP22,Decision Tree,0.6833333333333333,phase_accuracy_w1000.csv
+EP23,Decision Tree,0.7333333333333333,phase_accuracy_w1000.csv
+EP25,Decision Tree,0.7166666666666667,phase_accuracy_w1000.csv
+EP26,Decision Tree,0.6,phase_accuracy_w1000.csv
+EP27,Decision Tree,0.4333333333333333,phase_accuracy_w1000.csv
+EP28,Decision Tree,0.5833333333333334,phase_accuracy_w1000.csv
+EP29,Decision Tree,0.65,phase_accuracy_w1000.csv
+EP30,Decision Tree,0.5166666666666667,phase_accuracy_w1000.csv
+EP31,Decision Tree,0.5,phase_accuracy_w1000.csv
+EP32,Decision Tree,0.4333333333333333,phase_accuracy_w1000.csv
+EP33,Decision Tree,0.5333333333333333,phase_accuracy_w1000.csv
+EP03,Linear SVM,0.6333333333333333,phase_accuracy_w1000.csv
+EP05,Linear SVM,0.6166666666666667,phase_accuracy_w1000.csv
+EP06,Linear SVM,0.6833333333333333,phase_accuracy_w1000.csv
+EP07,Linear SVM,0.9166666666666666,phase_accuracy_w1000.csv
+EP09,Linear SVM,0.6166666666666667,phase_accuracy_w1000.csv
+EP10,Linear SVM,0.8833333333333333,phase_accuracy_w1000.csv
+EP11,Linear SVM,0.55,phase_accuracy_w1000.csv
+EP12,Linear SVM,0.7,phase_accuracy_w1000.csv
+EP13,Linear SVM,0.9333333333333332,phase_accuracy_w1000.csv
+EP14,Linear SVM,0.6666666666666666,phase_accuracy_w1000.csv
+EP15,Linear SVM,0.6,phase_accuracy_w1000.csv
+EP16,Linear SVM,0.7333333333333333,phase_accuracy_w1000.csv
+EP17,Linear SVM,0.6,phase_accuracy_w1000.csv
+EP18,Linear SVM,0.8333333333333334,phase_accuracy_w1000.csv
+EP19,Linear SVM,0.6333333333333333,phase_accuracy_w1000.csv
+EP20,Linear SVM,0.8,phase_accuracy_w1000.csv
+EP21,Linear SVM,0.6166666666666667,phase_accuracy_w1000.csv
+EP22,Linear SVM,0.7,phase_accuracy_w1000.csv
+EP23,Linear SVM,0.8333333333333334,phase_accuracy_w1000.csv
+EP25,Linear SVM,0.8666666666666667,phase_accuracy_w1000.csv
+EP26,Linear SVM,0.7333333333333333,phase_accuracy_w1000.csv
+EP27,Linear SVM,0.5833333333333334,phase_accuracy_w1000.csv
+EP28,Linear SVM,0.75,phase_accuracy_w1000.csv
+EP29,Linear SVM,0.7,phase_accuracy_w1000.csv
+EP30,Linear SVM,0.6833333333333333,phase_accuracy_w1000.csv
+EP31,Linear SVM,0.7,phase_accuracy_w1000.csv
+EP32,Linear SVM,0.5833333333333334,phase_accuracy_w1000.csv
+EP33,Linear SVM,0.6666666666666666,phase_accuracy_w1000.csv
+EP03,Ridge,0.6666666666666666,phase_accuracy_w1000.csv
+EP05,Ridge,0.65,phase_accuracy_w1000.csv
+EP06,Ridge,0.7166666666666667,phase_accuracy_w1000.csv
+EP07,Ridge,0.9166666666666666,phase_accuracy_w1000.csv
+EP09,Ridge,0.6166666666666667,phase_accuracy_w1000.csv
+EP10,Ridge,0.9,phase_accuracy_w1000.csv
+EP11,Ridge,0.6,phase_accuracy_w1000.csv
+EP12,Ridge,0.75,phase_accuracy_w1000.csv
+EP13,Ridge,0.9,phase_accuracy_w1000.csv
+EP14,Ridge,0.65,phase_accuracy_w1000.csv
+EP15,Ridge,0.5833333333333334,phase_accuracy_w1000.csv
+EP16,Ridge,0.7666666666666667,phase_accuracy_w1000.csv
+EP17,Ridge,0.5666666666666667,phase_accuracy_w1000.csv
+EP18,Ridge,0.85,phase_accuracy_w1000.csv
+EP19,Ridge,0.6166666666666667,phase_accuracy_w1000.csv
+EP20,Ridge,0.8,phase_accuracy_w1000.csv
+EP21,Ridge,0.7,phase_accuracy_w1000.csv
+EP22,Ridge,0.6833333333333333,phase_accuracy_w1000.csv
+EP23,Ridge,0.85,phase_accuracy_w1000.csv
+EP25,Ridge,0.9,phase_accuracy_w1000.csv
+EP26,Ridge,0.75,phase_accuracy_w1000.csv
+EP27,Ridge,0.65,phase_accuracy_w1000.csv
+EP28,Ridge,0.75,phase_accuracy_w1000.csv
+EP29,Ridge,0.7,phase_accuracy_w1000.csv
+EP30,Ridge,0.65,phase_accuracy_w1000.csv
+EP31,Ridge,0.8,phase_accuracy_w1000.csv
+EP32,Ridge,0.6666666666666666,phase_accuracy_w1000.csv
+EP33,Ridge,0.7,phase_accuracy_w1000.csv
+EP03,SVM,0.6,phase_accuracy_w1000.csv
+EP05,SVM,0.55,phase_accuracy_w1000.csv
+EP06,SVM,0.7666666666666667,phase_accuracy_w1000.csv
+EP07,SVM,0.9166666666666666,phase_accuracy_w1000.csv
+EP09,SVM,0.5166666666666667,phase_accuracy_w1000.csv
+EP10,SVM,0.8333333333333334,phase_accuracy_w1000.csv
+EP11,SVM,0.65,phase_accuracy_w1000.csv
+EP12,SVM,0.75,phase_accuracy_w1000.csv
+EP13,SVM,0.9166666666666666,phase_accuracy_w1000.csv
+EP14,SVM,0.7,phase_accuracy_w1000.csv
+EP15,SVM,0.5,phase_accuracy_w1000.csv
+EP16,SVM,0.7333333333333333,phase_accuracy_w1000.csv
+EP17,SVM,0.6,phase_accuracy_w1000.csv
+EP18,SVM,0.8333333333333334,phase_accuracy_w1000.csv
+EP19,SVM,0.6,phase_accuracy_w1000.csv
+EP20,SVM,0.75,phase_accuracy_w1000.csv
+EP21,SVM,0.65,phase_accuracy_w1000.csv
+EP22,SVM,0.7,phase_accuracy_w1000.csv
+EP23,SVM,0.75,phase_accuracy_w1000.csv
+EP25,SVM,0.8333333333333334,phase_accuracy_w1000.csv
+EP26,SVM,0.75,phase_accuracy_w1000.csv
+EP27,SVM,0.6,phase_accuracy_w1000.csv
+EP28,SVM,0.6666666666666666,phase_accuracy_w1000.csv
+EP29,SVM,0.6666666666666666,phase_accuracy_w1000.csv
+EP30,SVM,0.6333333333333333,phase_accuracy_w1000.csv
+EP31,SVM,0.7166666666666667,phase_accuracy_w1000.csv
+EP32,SVM,0.7,phase_accuracy_w1000.csv
+EP33,SVM,0.65,phase_accuracy_w1000.csv

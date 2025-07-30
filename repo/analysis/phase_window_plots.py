@@ -8,6 +8,11 @@ import matplotlib.pyplot as plt
 import matplotlib as mpl
 from copy import deepcopy
 from itertools import product
+import warnings
+
+# Filter out the specific warnings that are cluttering output
+warnings.filterwarnings("ignore", category=FutureWarning, module="seaborn")
+warnings.filterwarnings("ignore", category=UserWarning, module="seaborn")
 
 @dataclass
 class Config:
@@ -78,8 +83,8 @@ class TemporalGeneralization:
         return masked_data
     
     def threshold(self, data: np.ndarray, threshold: float) -> np.ndarray:
-        """Apply threshold, set to np.nan where < thresholdto temporal generalization matrix."""
-        data[ np.where(data < threshold) ] = np.nan
+        """Apply threshold, set to np.nan where < threshold to temporal generalization matrix."""
+        data[np.where(data < threshold)] = np.nan
         return data
     
     def find_max_along_test_time(self, data: np.ndarray, threshold: float) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
@@ -163,16 +168,24 @@ class Visualizer:
         
         df = pd.concat([loo_df, within_df])
         
-        # Format categorical columns
-        cat_type = pd.CategoricalDtype(categories=self.config.subjects + ['LOO'], ordered=True)
-        df['train_subject'] = df['train_subject'].astype(cat_type)
+        # Format categorical columns using modern pandas approach
+        df['train_subject'] = pd.Categorical(
+            df['train_subject'], 
+            categories=self.config.subjects + ['LOO'], 
+            ordered=True
+        )
         
-        cat_type = pd.CategoricalDtype(categories=self.config.subjects, ordered=True)
-        df['test_subject'] = df['test_subject'].astype(cat_type)
+        df['test_subject'] = pd.Categorical(
+            df['test_subject'], 
+            categories=self.config.subjects, 
+            ordered=True
+        )
         
-        # training_data = set(df['training_data'][::-1])
-        cat_type = pd.CategoricalDtype(categories=['within participant', 'across participants (LOO)'], ordered=True)
-        df['training_data'] = df['training_data'].astype(cat_type)
+        df['training_data'] = pd.Categorical(
+            df['training_data'], 
+            categories=['within participant', 'across participants (LOO)'], 
+            ordered=True
+        )
         
         return df
     
@@ -183,6 +196,7 @@ class Visualizer:
             fig, ax = plt.subplots(figsize=(8.7, 5.27))
             plt.ylim(0, 1)
             
+            # Use observed=True to handle future pandas behavior
             sns.barplot(
                 y='acc_train_peak',
                 x='training_data',
@@ -191,7 +205,7 @@ class Visualizer:
                 errwidth=3,
                 palette={
                     'within participant': '#FF9933',
-                    'across participants (LOO)': '#FF4D4D'
+                    'across participants (LOO)': '#FF0000'
                 },
                 errorbar=('ci', 95)
             )
@@ -209,75 +223,77 @@ class Visualizer:
             plt.close()
 
     def create_histogram_plot(self, df: pd.DataFrame, save_path: Path) -> None:
-            """Create and save histogram visualization of test time distributions."""
-            subtitles = ['within participant classification', 
-                        'across participants - LOO classification']
-            cbar = ['#FF9933', '#FF4D4D']
-            with mpl.rc_context(self.config.plot_params):
-                plt.style.use(['seaborn-v0_8-darkgrid', 'seaborn-v0_8-poster'])
+        """Create and save histogram visualization of test time distributions."""
+        subtitles = ['within participant classification', 
+                    'across participants - LOO classification']
+        
+        with mpl.rc_context(self.config.plot_params):
+            plt.style.use(['seaborn-v0_8-darkgrid', 'seaborn-v0_8-poster'])
 
-                g = sns.FacetGrid(
-                    df, 
-                    col="training_data",
-                    height=5,
-                    aspect=1.5, 
-                    hue="training_data",
-                    palette={
-                        'within participant': '#FF9933',
-                        'across participants (LOO)': '#FF4D4D'
-                    }
-                )
+            g = sns.FacetGrid(
+                df, 
+                col="training_data",
+                height=5,
+                aspect=1.5, 
+                hue="training_data",
+                palette={
+                    'within participant': '#FF9933',
+                    'across participants (LOO)': '#FF0000'
+                }
+            )
 
-                g.map(
-                    sns.histplot,
-                    't_test_peak',
-                    stat='percent',
-                    binwidth=200,
-                    binrange=(0, 1000),
-                    edgecolor="white",
-                    linewidth=1
-                )
+            g.map(
+                sns.histplot,
+                't_test_peak',
+                stat='percent',
+                binwidth=200,
+                binrange=(0, 1000),
+                edgecolor="white",
+                linewidth=1
+            )
 
-                # Format each facet
-                for i, ax in enumerate([g.facet_axis(0,0), g.facet_axis(0,1)]):
-                    # Set title and limits
-                    ax.set_title(subtitles[i])
-                    ax.set_ylim(0, 50)
+            # Format each facet
+            for i, ax in enumerate([g.facet_axis(0,0), g.facet_axis(0,1)]):
+                # Set title and limits
+                ax.set_title(subtitles[i])
+                ax.set_ylim(0, 50)
 
-                    # Add percentage labels on bars
-                    for patch in ax.patches:
-                        height = patch.get_height()
+                # Add percentage labels on bars
+                for patch in ax.patches:
+                    height = patch.get_height()
 
-                        # Determine text position and color
-                        if height == 0:
-                            vert_offset = 0.5
-                            text_color = 'gray'
-                        else:
-                            vert_offset = -3.5
-                            text_color = 'white'
+                    # Determine text position and color
+                    if height == 0:
+                        vert_offset = 0.5
+                        text_color = 'gray'
+                    else:
+                        vert_offset = -3.5
+                        text_color = 'white'
 
-                        # Add text
-                        ax.text(
-                            x=patch.get_x() + (patch.get_width()/2),
-                            y=height + vert_offset,
-                            s=f'{height:.0f}%',
-                            ha='center',
-                            fontsize=20,
-                            color=text_color,
-                            fontweight="bold"
-                        )
+                    # Add text
+                    ax.text(
+                        x=patch.get_x() + (patch.get_width()/2),
+                        y=height + vert_offset,
+                        s=f'{height:.0f}%',
+                        ha='center',
+                        fontsize=20,
+                        color=text_color,
+                        fontweight="bold"
+                    )
 
-                    # Set labels
-                    ax.set_xlabel('test time (ms)', fontsize=20)
-                    ax.set_ylabel('% of total subjects', fontsize=20)
+                # Set labels
+                ax.set_xlabel('test time (ms)', fontsize=20)
+                ax.set_ylabel('% of total subjects', fontsize=20)
 
-                    # Adjust tick parameters
-                    ax.tick_params(axis='both', pad=6)
+                # Adjust tick parameters
+                ax.tick_params(axis='both', pad=6)
 
-                plt.savefig(save_path, dpi=450, bbox_inches="tight")
-                plt.close()
+            # Use plt.tight_layout() instead of relying on figure.autolayout
+            plt.tight_layout()
+            plt.savefig(save_path, dpi=450, bbox_inches="tight")
+            plt.close()
+
 def main():
-    # Initialize configuration
     # Initialize configuration
     config = Config.create_default()
     
@@ -307,7 +323,9 @@ def main():
         df,
         config.project_path / 'results' / 'figures' / '_Phase-4-Distribution_of_Peak_Test_Time_Within_vs_Across_Participants.png'
     )
-
+    
+    # Save data
+    df.to_csv(config.project_path / 'results' / 'by_analysis_number'/ 'analysis-4-peak_window_accuracy.csv', index=False)
 
 if __name__ == "__main__":
     main()
